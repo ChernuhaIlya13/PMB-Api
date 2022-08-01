@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Configurations>Release;Development</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="NSwag.ApiDescription.Client" Version="13.15.5">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <OpenApiReference Include="OpenAPIs\swagger.json" CodeGenerator="NSwagCSharp" Options="/usebaseurl:true">
+            <Namespace>PMB.Integration.AllBestBets</Namespace>
+            <ClassName>AbbApiClient</ClassName>
+            <SourceUri>https://rest-api-lv.allbestbets.com/v3/api-docs/arbs</SourceUri>
+            <CodeGenerator>NSwagCSharp</CodeGenerator>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </OpenApiReference>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\libs\PMB.Abb.Models\PMB.Abb.Models.csproj" />
+    </ItemGroup>
+
+</Project>

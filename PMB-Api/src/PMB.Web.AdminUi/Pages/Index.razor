@@ -1,0 +1,44 @@
+﻿@page "/"
+@inject SessionManager _sessionManager
+@inject NavigationManager _navigationManager
+@inject AdminApiClient _apiClient
+
+@if (_isAuth)
+{
+    <Panel />
+}
+
+@code {
+
+    private bool _isAuth = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await _sessionManager.GetToken();
+        if (string.IsNullOrEmpty(token))
+        {
+            SwitchAuth(false);
+            _navigationManager.NavigateTo("login");
+        }
+        else
+        {
+            if (!await _apiClient.Ping(CancellationToken.None))
+            {
+                SwitchAuth(false);
+                _navigationManager.NavigateTo("login");
+            }
+            else
+            {
+                SwitchAuth(true);
+            }
+        }
+        
+        await base.OnInitializedAsync();
+    }
+
+    private void SwitchAuth(bool isAuth)
+    {
+        _isAuth = isAuth;
+        StateHasChanged();
+    }
+}

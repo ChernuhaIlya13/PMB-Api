@@ -1,0 +1,68 @@
+@inherits PanelRazor
+
+<div style="margin: 15px">
+    <MatOverline>Пользователи</MatOverline>
+</div>
+
+<MatStringField Style="margin: 15px" Label="Поиск по логину" OnInput="SearchByLoginCallback"/>
+
+<MatAccordion>
+    @foreach (var user in Users)
+    {
+        <MatExpansionPanel @bind-Expanded="@user.Expanded">
+            <MatExpansionPanelSummary>
+                <MatExpansionPanelHeader><MatOverline>Логин - @user.Login</MatOverline></MatExpansionPanelHeader>
+                <MatExpansionPanelSubHeader>
+                    <MatOverline>Кол-во ключей - @user.KeysCount</MatOverline>
+                </MatExpansionPanelSubHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+                <MatIconButton Icon="add" OnClick="@(() => DialogAddNewKeyOpen(user.Login))"></MatIconButton>
+                <MatTable Items="@user.Keys" class="mat-elevation-z5" ShowPaging="true" Striped="true" PageLabel="Страница" PageRecordCountLabel="Строк на странице">
+                    <MatTableHeader>
+                        <th>Логин</th>
+                        <th style="@colStyle">Ключ</th>
+                        <th style="@colStyle">Действует до</th>
+                        <th style="@colStyle">Заморожен</th>
+                        <th>#</th>
+                    </MatTableHeader>
+                    <MatTableRow>
+                        <td>@context.Login</td>
+                        <td>@context.Key</td>
+                        <td>@(NormalizeDate(context.KeyExpirationTime))</td>
+                        <td>@(context.FreezeTime.HasValue ? NormalizeDate(context.FreezeTime.Value) : "-")</td>
+                        <td>
+                            <MatSlideToggle Value="@(!context.IsFreeze)" TValue="bool" ValueChanged="@(e => ChangeKeyState(e, context.Key, context.Login))">
+                            </MatSlideToggle>
+                            <MatButton Icon="delete" OnClick="@(() => RemoveKey(context))"></MatButton>
+                            <MatButton Icon="create" OnClick="@(() => DialogDateChangeOpen(context))"></MatButton>
+                        </td>
+                    </MatTableRow>
+                </MatTable>
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+    }
+    <MatDialog @bind-IsOpen="@DateChangeDialogIsOpen">
+        <MatDialogTitle>@($"{DateChangeDialogKeyModel?.Login} - {DateChangeDialogKeyModel?.Key}")</MatDialogTitle>
+        <MatDialogContent>
+            <p>Время действия ключа</p>
+            <MatDatePicker @bind-Value="DateChangeSelected"></MatDatePicker>
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton OnClick="@DialogDateChangeClose">Закрыть</MatButton>
+            <MatButton OnClick="DialogDateChangeOk">OK</MatButton>
+        </MatDialogActions>
+    </MatDialog>
+    
+    <MatDialog @bind-IsOpen="@AddNewKeyDialogIsOpen">
+        <MatDialogTitle>@(AddNewKeyLoginSelected)</MatDialogTitle>
+        <MatDialogContent>
+            <p>Время действия ключа</p>
+            <MatDatePicker @bind-Value="@AddNewKeyDateSelected"></MatDatePicker>
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton OnClick="@DialogAddNewKeyClose">Закрыть</MatButton>
+            <MatButton OnClick="DialogAddNewKeyOk">OK</MatButton>
+        </MatDialogActions>
+    </MatDialog>
+</MatAccordion>

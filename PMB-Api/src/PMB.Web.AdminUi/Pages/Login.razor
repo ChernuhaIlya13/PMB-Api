@@ -1,0 +1,60 @@
+@page "/login"
+@inject AdminApiClient _adminApiClient
+@inject SessionManager _sessionManager
+@inject NavigationManager _navigationManager
+@inject IMatToaster _toaster
+
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell"></div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell">
+            <MatPaper Elevation="10" Rounded="true">
+                <EditForm Model="model" OnValidSubmit="LoginAsync">
+                    <div class="d-col">
+                        <MatButton Disabled="true" Class="login-element">Вход</MatButton>
+                        <MatTextField
+                            @bind-Value="@model.Login"
+                            Class="login-element"
+                            Required="true"
+                            Label="Логин">
+                        </MatTextField>
+                        <MatTextField
+                            @bind-Value="@model.Password"
+                            Icon="lock_outline"
+                            Class="login-element"
+                            IconTrailing="true"
+                            Required="true"
+                            Type="password"
+                            Label="Пароль">
+                        </MatTextField>
+                        <MatButton
+                            Icon="keyboard_tab"
+                            Class="login-button"
+                            Type="submit"
+                            Label="Войти"></MatButton>
+                    </div>
+                </EditForm>
+            </MatPaper>
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell"></div>
+    </div>
+</div>
+
+@code {
+    private LoginRequest model = new();
+
+    private async void LoginAsync()
+    {
+        var response = await _adminApiClient.Login(model, CancellationToken.None);
+
+        if (response != null)
+        {
+            await _sessionManager.SetToken(response.Token);
+            _navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            _toaster.ServerError();
+        }
+    }
+}

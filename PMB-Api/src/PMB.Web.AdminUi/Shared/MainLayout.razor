@@ -1,0 +1,16 @@
+@inherits LayoutComponentBase
+
+<MatAppBarContainer>
+    <MatPortalHost></MatPortalHost>
+    <MatAppBar Fixed="true">
+        <MatAppBarRow>
+            <MatAppBarSection>
+                <MatAppBarTitle>PMB админ-панель</MatAppBarTitle>
+            </MatAppBarSection>
+        </MatAppBarRow>
+    </MatAppBar>
+
+    <MatAppBarContent>
+        @Body
+    </MatAppBarContent>
+</MatAppBarContainer>

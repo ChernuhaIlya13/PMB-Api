@@ -1,0 +1,50 @@
+pipelines:
+  default:
+    - parallel:
+        - step:
+            name: Build and Test
+            image: mcr.microsoft.com/dotnet/sdk:6.0
+            script:             
+              - REPORTS_PATH=./test-reports/build_${BITBUCKET_BUILD_NUMBER}
+              - dotnet restore
+              - dotnet build --no-restore
+              - dotnet test --no-build --environment 'Development' --test-adapter-path:. --logger:"junit;LogFilePath=$REPORTS_PATH/junit.xml"
+            services:
+              - postgres
+        - step:
+            name: Publish Nuget
+            image: mcr.microsoft.com/dotnet/sdk:6.0
+            trigger: manual
+            script:
+              - sh -c "$(curl -fsSL https://aka.ms/install-artifacts-credprovider.sh)"
+              - dotnet nuget add source https://pkgs.dev.azure.com/pmb-project/pmb-nuget/_packaging/pmb/nuget/v3/index.json -n pmb -u unused -p $NUGET_API_KEY --store-password-in-clear-text
+              - export SOLUTION_NAME=pmb
+              - export RELEASES_DIR="./releases"
+              - export NUPKG_VERSION=1.${BITBUCKET_BUILD_NUMBER}.0
+
+              - dotnet restore
+              - dotnet build --configuration Release
+
+              - dotnet pack ${SOLUTION_NAME}.sln --output ${RELEASES_DIR} --configuration Release -p:Version=${NUPKG_VERSION}
+              - for fileName in ${RELEASES_DIR}/*; do dotnet nuget push $fileName --api-key az --source "pmb"; done
+        - step:
+           name: Deploy to Heroku
+           image: atlassian/default-image:latest
+           trigger: manual
+           script:
+             - docker build -t pmb-api .
+             - docker login --username=$HEROKU_USERNAME --password=$HEROKU_API_KEY registry.heroku.com
+             - docker tag pmb-api registry.heroku.com/$HEROKU_APP_NAME/web
+             - docker push registry.heroku.com/$HEROKU_APP_NAME/web
+             - curl https://cli-assets.heroku.com/install.sh | sh
+             - heroku container:release web -a $HEROKU_APP_NAME
+           services:
+            - docker
+definitions:
+  services:
+    postgres:
+      image: postgres
+      variables:
+        POSTGRES_USER: 'postgres'
+        POSTGRES_PASSWORD: 'mysecretpassword'
+        POSTGRES_DB: 'postgres'

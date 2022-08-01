@@ -1,0 +1,817 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ARBS API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://rest-api-lv.allbestbets.com",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/v1/arbs/bot_pro_search": {
+      "post": {
+        "tags": [
+          "arb-controller"
+        ],
+        "description": "Getting a list of surebets by specified criteria",
+        "operationId": "botProSearch",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ArbApiRequest"
+              },
+              "encoding": {
+                "search_filter[]": {
+                  "contentType": "application/x-www-form-urlencoded",
+                  "style": "form",
+                  "explode": true
+                },
+                "bk_ids[]": {
+                  "contentType": "application/x-www-form-urlencoded",
+                  "style": "form",
+                  "explode": true
+                },
+                "event_arb_types[]": {
+                  "contentType": "application/x-www-form-urlencoded",
+                  "style": "form",
+                  "explode": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "402": {
+            "description": "Payment required response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArbApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/valuebets/bot_pro_search": {
+      "post": {
+        "tags": [
+          "valuebet-controller"
+        ],
+        "description": "Getting a list of valuebets by specified criteria",
+        "operationId": "searchValueBetsByBot",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ValuebetApiRequest"
+              },
+              "encoding": {
+                "search_filter[]": {
+                  "contentType": "application/x-www-form-urlencoded",
+                  "style": "form",
+                  "explode": true
+                },
+                "bk_ids[]": {
+                  "contentType": "application/x-www-form-urlencoded",
+                  "style": "form",
+                  "explode": true
+                },
+                "event_arb_types[]": {
+                  "contentType": "application/x-www-form-urlencoded",
+                  "style": "form",
+                  "explode": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "402": {
+            "description": "Payment required response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValuebetApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorDto": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error description"
+          }
+        }
+      },
+      "ArbApiRequest": {
+        "required": [
+          "access_token",
+          "search_filter[]"
+        ],
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Token for accessing the API (available in the user's dashboard)"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of surebets in the search results (for example: per_page = 20)",
+            "format": "int32"
+          },
+          "search_filter[]": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "List of filters that will be used to search for surebets (for example: search_filter[]=1&search_filter[]=2)",
+              "format": "int64"
+            }
+          },
+          "grouped": {
+            "type": "boolean",
+            "description": "Return surebets grouped by event (grouped = 1) or not (grouped = 0)"
+          },
+          "bookmakers2[]": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "List of bookmakers that must be involved in the surebet  (overrides the list in filters) (for example: bookmakers2[]=10&bookmakers2[]=4)",
+              "format": "int32"
+            }
+          },
+          "event_id": {
+            "type": "integer",
+            "description": "Return surebets only for the event with the specified ID (for example: event_id = 123456). Event’s surebet list can be found in separate array “event_arbs”",
+            "format": "int64"
+          },
+          "show_event_arbs": {
+            "type": "boolean",
+            "description": "Show event’s surebet if event_id is passed"
+          },
+          "event_arb_types[]": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "Return surebets only for the listed surebet types, possible values from 1 to 9 (1X2, Handicaps, Totals, Individual Totals, Statistics, Additionals, Game Winner, Corners, Cards) (for example: event_arb_types[]=1&event_arb_types=2)",
+              "format": "int32"
+            }
+          },
+          "excluded_events[]": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Exclude surebets from search results for events with given IDs (for example: excluded_events[]=123456&excluded_events[]=789012)"
+            }
+          },
+          "excluded_bk_events[]": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Exclude surebets from search results for events at bookmakers with given IDs (for example: excluded_bk_events[]=123456&excluded_bk_events[]=789012)"
+            }
+          },
+          "excluded_bets[]": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Exclude surebets from search results for outcomes with given IDs (for example: excluded_bets[]=XXXXXX&excluded_bets[]=YYYYYY)"
+            }
+          },
+          "sort_by": {
+            "type": "string",
+            "description": "Sorting surebets in the search results (for example: sort_by = percent)",
+            "enum": [
+              "percent",
+              "roi",
+              "value_bet_index",
+              "valuebet_percent",
+              "middle_value",
+              "middles",
+              "age",
+              "arb_age",
+              "middle_age",
+              "started_at",
+              "beginningTime",
+              "event_time",
+              "arb_created_at"
+            ]
+          }
+        }
+      },
+      "ArbApiResponse": {
+        "required": [
+          "arbs",
+          "bets"
+        ],
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Number of surebets in the response",
+            "format": "int32"
+          },
+          "totalByFilter": {
+            "type": "integer",
+            "description": "Number of surebets in the system for the specified filters",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Number of surebets in the system (total)",
+            "format": "int32"
+          },
+          "arbs": {
+            "type": "array",
+            "description": "List of surebets",
+            "items": {
+              "$ref": "#/components/schemas/ArbsDto"
+            }
+          },
+          "bets": {
+            "type": "array",
+            "description": "List of outcomes involved in received surebets",
+            "items": {
+              "$ref": "#/components/schemas/BetDto"
+            }
+          },
+          "maxPercentByFilter": {
+            "type": "number",
+            "description": "Maximum surebet's percentage in the system for the given filters",
+            "format": "float"
+          },
+          "maxPercent": {
+            "type": "number",
+            "description": "Maximum surebet's percentage in the system",
+            "format": "float"
+          }
+        }
+      },
+      "ArbsDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Surebet ID"
+          },
+          "event_id": {
+            "type": "integer",
+            "description": "Event ID (reference)",
+            "format": "int64"
+          },
+          "arb_formula_id": {
+            "type": "integer",
+            "description": "Surebet formula ID",
+            "format": "int32"
+          },
+          "percent": {
+            "type": "number",
+            "description": "Surebet’s yield percentage",
+            "format": "float"
+          },
+          "bet1_id": {
+            "type": "string",
+            "description": "First outcome ID in the surebet formula"
+          },
+          "bet2_id": {
+            "type": "string",
+            "description": "Second  outcome ID in the surebet formula"
+          },
+          "bet3_id": {
+            "type": "string",
+            "description": "Third outcome ID in the surebet formula (for 3way surebets)"
+          },
+          "arb_type": {
+            "type": "string",
+            "description": "Surebet type (sport ID and outcome type, separated by a colon) (for example: arb_type=8:1)"
+          },
+          "min_koef": {
+            "type": "number",
+            "description": "Minimum betting odds in the surebet",
+            "format": "float"
+          },
+          "max_koef": {
+            "type": "number",
+            "description": "Maximum betting odds in the surebet",
+            "format": "float"
+          },
+          "f": {
+            "type": "integer",
+            "description": "Bit mask of event ID, sport ID and outcome ID in the surebet",
+            "format": "int32"
+          },
+          "roi": {
+            "type": "integer",
+            "description": "ROI (return of investments)",
+            "format": "int64"
+          },
+          "bk_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "Битовая маска ID букмекеров, участвующих в вилке",
+              "format": "int64"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Surebet generation time - Unix timestamp",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last surebet update time - Unix timestamp",
+            "format": "date-time"
+          },
+          "started_at": {
+            "type": "string",
+            "description": "Match start time - Unix timestamp",
+            "format": "date-time"
+          },
+          "middle_value": {
+            "type": "number",
+            "description": "Middle value",
+            "format": "float"
+          },
+          "cornerScore": {
+            "type": "string",
+            "description": "Corners score (for football)"
+          },
+          "league": {
+            "type": "string",
+            "description": "League name (reference)"
+          },
+          "league_id": {
+            "type": "integer",
+            "description": "League ID (reference)",
+            "format": "int64"
+          },
+          "sport_id": {
+            "type": "integer",
+            "description": "Sport IDа",
+            "format": "int32"
+          },
+          "country_id": {
+            "type": "integer",
+            "description": "Country ID for the event league",
+            "format": "int32"
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "true - Event in a break"
+          },
+          "homeId": {
+            "type": "integer",
+            "description": "Home team ID (reference)",
+            "format": "int64"
+          },
+          "away_id": {
+            "type": "integer",
+            "description": "Away team ID (reference)",
+            "format": "int64"
+          },
+          "is_live": {
+            "type": "boolean",
+            "description": "true - live event, false - prematch event"
+          },
+          "home": {
+            "type": "string",
+            "description": "Home team name"
+          },
+          "away": {
+            "type": "string",
+            "description": "Away team name"
+          },
+          "name": {
+            "type": "string",
+            "description": "Reference event name"
+          },
+          "f_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "List of surebets"
+      },
+      "BetDto": {
+        "type": "object",
+        "properties": {
+          "home": {
+            "type": "string",
+            "description": "Home team name (on the bookmaker's website)"
+          },
+          "away": {
+            "type": "string",
+            "description": "Away team name (on the bookmaker's website)"
+          },
+          "started_at": {
+            "type": "integer",
+            "description": "Start time of the match (on the bookmaker's website) - Unix timestamp",
+            "format": "int64"
+          },
+          "league": {
+            "type": "string",
+            "description": "League name (on the bookmaker's website)"
+          },
+          "bookmaker_league_id": {
+            "type": "integer",
+            "description": "League ID (on the bookmaker's website",
+            "format": "int64"
+          },
+          "sport_id": {
+            "type": "integer",
+            "description": "Sport ID",
+            "format": "int64"
+          },
+          "home_id": {
+            "type": "integer",
+            "description": "Home team ID in the bookmaker's system",
+            "format": "int64"
+          },
+          "away_id": {
+            "type": "integer",
+            "description": "Away team ID in the bookmaker's system",
+            "format": "int64"
+          },
+          "team_home_id": {
+            "type": "integer",
+            "description": "Home team ID (reference)",
+            "format": "int64"
+          },
+          "team_away_id": {
+            "type": "integer",
+            "description": "Away team ID (reference)",
+            "format": "int64"
+          },
+          "league_id": {
+            "type": "integer",
+            "description": "League ID (reference)",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Outcome update time - Unix timestamp",
+            "format": "date-time"
+          },
+          "swap_teams": {
+            "type": "boolean",
+            "description": "false - the order of teams on the bookmaker's website has been changed, true - the order of teams coincides with the reference event"
+          },
+          "bookmaker_event_name": {
+            "type": "string",
+            "description": "Event name (on the bookmaker's website)"
+          },
+          "event_name": {
+            "type": "string",
+            "description": "Event name (reference)"
+          },
+          "id": {
+            "type": "string",
+            "description": "Outcome ID"
+          },
+          "koef": {
+            "type": "number",
+            "description": "Outcome odds",
+            "format": "float"
+          },
+          "diff": {
+            "type": "integer",
+            "description": "Direction of the odds change (0 - did not change, 1- increased, 2- decreased)",
+            "format": "int32"
+          },
+          "bookmaker_event_id": {
+            "type": "integer",
+            "description": "Event ID in the bookmaker's system",
+            "format": "int64"
+          },
+          "event_id": {
+            "type": "integer",
+            "description": "Reference event ID",
+            "format": "int64"
+          },
+          "bookmaker_id": {
+            "type": "integer",
+            "description": "Bookmaker ID",
+            "format": "int32"
+          },
+          "period_id": {
+            "type": "integer",
+            "description": "Period ID",
+            "format": "int32"
+          },
+          "direct_link": {
+            "type": "string",
+            "description": "Data for searching a bet on the bookmaker's website"
+          },
+          "koef_lay": {
+            "type": "number",
+            "description": "LAY betting odds (if applicable)",
+            "format": "float"
+          },
+          "is_lay": {
+            "type": "integer",
+            "description": "1 - Bet converted from LAY, 0 - regular bet",
+            "format": "int32"
+          },
+          "market_and_bet_type": {
+            "type": "integer",
+            "description": "Market Variations, described at this page https://www.betburger.com/api/entity_ids (Variations)",
+            "format": "int32"
+          },
+          "market_and_bet_type_param": {
+            "type": "number",
+            "description": "Value for variation, if applicable (spreads and totals)",
+            "format": "float"
+          },
+          "current_score": {
+            "type": "string",
+            "description": "Current event score at the bookmaker"
+          },
+          "bookmaker_event_direct_link": {
+            "type": "string",
+            "description": "Data for searching an event on the bookmaker's website"
+          }
+        },
+        "description": "List of outcomes involved in received surebets"
+      },
+      "ValuebetApiRequest": {
+        "required": [
+          "access_token",
+          "search_filter[]"
+        ],
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Token for accessing the API (available in the user's dashboard)"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of valuebets in the search results (for example: per_page = 20)",
+            "format": "int32"
+          },
+          "search_filter[]": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "List of filters that will be used to search for valuebets (for example: search_filter[]=1&search_filter[]=2)",
+              "format": "int64"
+            }
+          },
+          "grouped": {
+            "type": "boolean",
+            "description": "Return valuebets grouped by event (grouped = 1) or not (grouped = 0)"
+          },
+          "bookmakers2[]": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "List of bookmakers that must be involved in the valuebet (overrides the list in filters) (for example: bookmakers2[]=10&bookmakers2[]=4)",
+              "format": "int32"
+            }
+          },
+          "event_id": {
+            "type": "integer",
+            "description": "Return valuebets only for the event with the specified ID (for example: event_id = 123456)",
+            "format": "int64"
+          },
+          "event_arb_types[]": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "description": "Return valuebets only for the listed valuebet types, possible values from 1 to 9 (1X2, Handicaps, Totals, Individual Totals, Statistics, Additionals, Game Winner, Corners, Cards) (for example: event_arb_types[]=1&event_arb_types=2)",
+              "format": "int32"
+            }
+          },
+          "excluded_events[]": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Exclude valuebets from search results for events with given IDs (for example: excluded_events[]=123456&excluded_events[]=789012)"
+            }
+          },
+          "excluded_bk_events[]": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Exclude valuebets from search results for events at bookmakers with given IDs (for example: excluded_bk_events[]=123456&excluded_bk_events[]=789012)"
+            }
+          },
+          "excluded_bets[]": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Exclude valuebets from search results for outcomes with given IDs (for example: excluded_bets[]=XXXXXX&excluded_bets[]=YYYYYY)"
+            }
+          },
+          "max_arbs_by_event": {
+            "type": "integer",
+            "description": "Description for max_arbs_by_event",
+            "format": "int32"
+          },
+          "sort_by": {
+            "type": "string",
+            "description": "Sorting valuebets in the search results (for example: sort_by = percent)",
+            "enum": [
+              "percent",
+              "valuebet_percent",
+              "updated_at",
+              "started_at",
+              "value_bet_index"
+            ]
+          }
+        }
+      },
+      "ValuebetApiResponse": {
+        "required": [
+          "arbs",
+          "bets"
+        ],
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Number of valuebets in the response",
+            "format": "int32"
+          },
+          "totalByFilter": {
+            "type": "integer",
+            "description": "Number of valuebets in the system for the specified filters",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Number of valuebets in the system (total)",
+            "format": "int32"
+          },
+          "arbs": {
+            "type": "array",
+            "description": "List of surebets",
+            "items": {
+              "$ref": "#/components/schemas/ArbsDto"
+            }
+          },
+          "bets": {
+            "type": "array",
+            "description": "List of outcomes involved in received valuebets",
+            "items": {
+              "$ref": "#/components/schemas/BetDto"
+            }
+          },
+          "maxPercentByFilter": {
+            "type": "number",
+            "description": "Maximum valuebet's percentage in the system for the given filters",
+            "format": "float"
+          },
+          "maxPercent": {
+            "type": "number",
+            "description": "Maximum valuebet's percentage in the system",
+            "format": "float"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ValuebetSourceDto"
+          }
+        }
+      },
+      "ValuebetDto": {
+        "type": "object",
+        "properties": {
+          "bet_id": {
+            "type": "string",
+            "description": "string Outcome ID"
+          },
+          "percent": {
+            "type": "number",
+            "description": "Valuebet percent",
+            "format": "float"
+          },
+          "avg_koef": {
+            "type": "number",
+            "description": "Outcome average coefficient",
+            "format": "float"
+          },
+          "started_at": {
+            "type": "integer",
+            "description": "Start time (on the bookmaker’s site)",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "description": "The time of the last update of the outcome",
+            "format": "int64"
+          },
+          "arbs_count": {
+            "type": "integer",
+            "description": "The number of 2-way surebets with the given outcome",
+            "format": "int32"
+          }
+        }
+      },
+      "ValuebetSourceDto": {
+        "type": "object",
+        "properties": {
+          "valueBets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValuebetDto"
+            }
+          },
+          "arbs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArbsDto"
+            }
+          },
+          "eventValueBets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValuebetDto"
+            }
+          },
+          "eventArbs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArbsDto"
+            }
+          }
+        }
+      }
+    }
+  }
+}

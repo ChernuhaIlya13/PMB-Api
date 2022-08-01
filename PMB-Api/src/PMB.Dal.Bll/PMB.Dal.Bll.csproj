@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <Configurations>Release;Development</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+        <PackageReference Include="System.Reactive" Version="5.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\libs\PMB.Abb.Models\PMB.Abb.Models.csproj" />
+        <ProjectReference Include="..\..\libs\PMB.Models\PMB.Models.csproj" />
+        <ProjectReference Include="..\PMB.Integration.Currencies\PMB.Integration.Currencies.csproj" />
+        <ProjectReference Include="..\PMB.Dal\PMB.Dal.csproj" />
+        <ProjectReference Include="..\PMB.Integration.PositiveBet\PMB.Integration.PositiveBet.csproj" />
+    </ItemGroup>
+
+</Project>
